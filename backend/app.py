@@ -6,10 +6,6 @@ import db
 app = Flask(__name__)
 CORS(app)
 
-# PERSONAL TO DO LIST
-# - Error checking for create students
-# - Error checking for updating students
-
 # Instructions:
 # - Use the functions in backend/db.py in your implementation.
 # - You are free to use additional data structures in your solution

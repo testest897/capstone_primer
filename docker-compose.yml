@@ -34,6 +34,7 @@ services:
     environment:
       VITE_API_URL: http://localhost:5000 # Should this be localhost?
 
+
   automark:
     build: ./automark
     depends_on:
