@@ -6,6 +6,10 @@ import db
 app = Flask(__name__)
 CORS(app)
 
+# PERSONAL TO DO LIST
+# - Error checking for create students
+# - Error checking for updating students
+
 # Instructions:
 # - Use the functions in backend/db.py in your implementation.
 # - You are free to use additional data structures in your solution
@@ -18,10 +22,21 @@ def get_students():
     return: Array of student objects
     """
     # TODO: replace with your implementation. This is a mock response
+
+    print("test test this is a test")
+
+    students = db.get_all_students()
+    for student in students:
+        print(student)
+    
+    return jsonify(students), 200
+
+'''
     return jsonify([
         {'course': 'COMP1531', 'id': 1, 'mark': 85, 'name': 'Alice Zhang'},
         {'course': 'COMP1531', 'id': 2, 'mark': 72, 'name': 'Bob Smith'}
     ]), 200
+'''
 
 
 @app.route("/students", methods=["POST"])
@@ -37,7 +52,14 @@ def create_student():
     # Getting the request body - replace with your implementation
     student_data = request.json
 
-    pass
+    students = db.get_all_students()
+    for student in students:
+        if student["name"] == student_data["name"] and student["course"] == student_data["course"]:
+            return "Error: Cannot enter duplicate entries", 400
+
+    student = db.insert_student(student_data["name"], student_data["course"], student_data["mark"])
+
+    return student, 200
 
 
 @app.route("/students/<int:student_id>", methods=["PUT"])
@@ -49,6 +71,13 @@ def update_student(student_id):
     param mark: The mark the student received (from request body)
     return: The updated student if successful
     """
+
+    updated_data = request.json
+
+    updated_student = db.update_student(student_id, updated_data["name"], updated_data["course"], updated_data["mark"])
+
+    return updated_student, 200
+
     pass  # replace with your implementation
 
 
@@ -58,6 +87,11 @@ def delete_student(student_id):
     Route to delete student by id
     return: The deleted student
     """
+
+    deleted_student = db.delete_student(student_id)
+
+    return deleted_student
+
     pass  # replace with your implementation
 
 
@@ -67,6 +101,22 @@ def get_stats():
     Route to show the stats of all student marks 
     return: An object with the stats (count, average, min, max)
     """
+
+    students = db.get_all_students()
+    num_students = 0
+    avg = 0
+    min = -1
+    max = 0
+
+    for student in students:
+        num_students += 1
+        avg += student["mark"]
+        if min == -1: min = student["mark"]
+        if student["mark"] < min: min = student["mark"]
+        if student["mark"] > max: max = student["mark"]
+    avg /= num_students
+
+    return {"count": num_students, "average": avg, "min": min, "max": max}, 200
     pass  # replace with your implementation
 
 
