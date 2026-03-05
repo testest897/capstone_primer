@@ -51,7 +51,7 @@ def create_student():
     students = db.get_all_students()
     for student in students:
         if student["name"] == student_data["name"] and student["course"] == student_data["course"]:
-            return "Error: Cannot enter duplicate entries", 400
+            return jsonify({"Status": "Error: Cannot insert duplicate entries"}), 400
 
     student = db.insert_student(student_data["name"], student_data["course"], student_data["mark"])
 
@@ -70,6 +70,10 @@ def update_student(student_id):
 
     updated_data = request.json
 
+    student = db.get_student_by_id(student_id)
+    if student == None:
+        return jsonify({"Error": "No such student  id"}), 404
+
     updated_student = db.update_student(student_id, updated_data["name"], updated_data["course"], updated_data["mark"])
 
     return updated_student, 200
@@ -84,6 +88,9 @@ def delete_student(student_id):
     return: The deleted student
     """
 
+    student = db.get_student_by_id(student_id)
+    if student == None:
+        return jsonify({"Error": "No such student  id"}), 404
     deleted_student = db.delete_student(student_id)
 
     return deleted_student
@@ -100,17 +107,18 @@ def get_stats():
 
     students = db.get_all_students()
     num_students = 0
+    set_min = False
     avg = 0
-    min = -1
+    min = 0
     max = 0
 
     for student in students:
         num_students += 1
         avg += student["mark"]
-        if min == -1: min = student["mark"]
+        if set_min == False: min = student["mark"] ; set_min = True
         if student["mark"] < min: min = student["mark"]
         if student["mark"] > max: max = student["mark"]
-    avg /= num_students
+    if num_students != 0: avg /= num_students
 
     return {"count": num_students, "average": avg, "min": min, "max": max}, 200
     pass  # replace with your implementation
